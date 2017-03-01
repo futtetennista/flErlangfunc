@@ -105,12 +105,12 @@ median(Xs) ->
     Ys = isort(Xs),
     find_median(Ys,Ys,0,hd(Ys)).
 
+isort(Xs) ->
+    foldr(fun insert/2,[],Xs).
 foldr(_,Acc,[]) ->
     Acc;
 foldr(F,Acc,[X|Xs]) ->
     F(X,foldr(F,Acc,Xs)).
-isort(Xs) ->
-    foldr(fun insert/2,[],Xs).
 insert(X,Xs) ->
     foldr(fun swap/2,[X],Xs).
 swap(Y,[X|_Xs]=Acc) when X > Y ->
@@ -132,14 +132,14 @@ modes(Xs) ->
 modes([],Occs) ->
     extract_modes(Occs,{[],0});
 modes([X|Xs],Occs) ->
-    modes(Xs,count_occurrence(X,Occs)).
+    modes(Xs,count_occurrence(X,[],Occs)).
 
-count_occurrence(X,[{X,Occ}|Xs]) ->
-    [{X,Occ+1}|Xs];
-count_occurrence(X,[Y|Xs]) ->
-    [Y] ++ count_occurrence(X,Xs);
-count_occurrence(X,[]) ->
-    [{X,1}].
+count_occurrence(X,Init,[{X,Occ}|Tail]) ->
+    Init ++ [{X,Occ+1}] ++ Tail;
+count_occurrence(X,Init, [Y|Tail]) ->
+    count_occurrence(X,Init ++ [Y],Tail);
+count_occurrence(X,Init,[]) ->
+    Init ++ [{X,1}].
 
 extract_modes([],Acc) ->
     Acc;
