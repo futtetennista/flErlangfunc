@@ -103,3 +103,14 @@ perfect(X,Y,Acc) when X rem Y == 0 ->
     perfect(X, Y - 1, Acc + Y);
 perfect(X,Y,Acc) ->
     perfect(X, Y - 1, Acc).
+
+perfect1(X) ->
+    perfect1(X, 0, X div 2).
+perfect1(X, X, 0) ->
+    true;
+perfect1(X,_,0) ->
+    false;
+perfect1(X, Acc, Div) when X rem Div == 0 ->
+    perfect(X,Acc+Div,Div-1);
+perfect1(X,Acc,Div) ->
+    perfect(X,Acc,Div-1).
