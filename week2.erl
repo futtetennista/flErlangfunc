@@ -1,60 +1,78 @@
 -module(week2).
 -export([]).
+-include_lib("eunit/include/eunit.hrl").
 
-test() ->
-    assert_equals("productR", 24, productR([1,2,3,4])),
-    assert_equals("productTR", 24, productTR([1,2,3,4])),
-    assert_equals("maxR", 3, maxR([1,2,3,-4])),
-    assert_equals("maxTR", 3, maxTR([1,2,3,-4])),
-    assert_equals("maxR (singleton list)", 1, maxR([1])),
-    assert_equals("maxTR (singleton list)", 1, maxTR([1])),
-    assert_equals("maxFold (singleton list)", 33, maxFold([1,11,6,33])),
-    assert_equals("maxFold (singleton list)", 1, maxFold([1])),
-    assert_equals("median of [9,8,6,5,3]", 6, median([9,8,6,5,3])),
-    assert_equals("modes of [8,  11,  9,  14,  9,  15,  18,  6,  9,  10]",
-                 [9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
-    assert_equals("modes of [15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]",
-                 [18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26])).
+suite() ->
+    [
+     product_test_(),
+     max_test_(),
+     median_test_(),
+     median_test_(),
+     modes_test_()
+    ].
+
+product_test_() ->
+    [
+     ?assertEqual(24, product_r([1,2,3,4])),
+     ?assertEqual(24, product_tr([1,2,3,4])),
+     ?assertEqual(1, product_tr([]))
+    ].
+
+max_test_() ->
+    [
+     ?assertEqual(3, max_r([1,2,3,-4])),
+     ?assertEqual(3, max_tr([1,2,3,-4])),
+     ?assertEqual(1, max_r([1])),
+     ?assertEqual(1, max_tr([1])),
+     ?assertEqual(33, max_fold([1,11,6,33])),
+     ?assertEqual(1, max_fold([1]))
+    ].
+
+median_test_() ->
+    [
+     ?assertEqual(6, median([9,8,6,5,3])),
+     ?assertEqual(6, median([9,8,6,5,3,11])),
+     ?assertEqual(9, median([9]))
+    ].
+
+modes_test_() ->
+    [
+     ?assertEqual([9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
+     ?assertEqual([18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]))
+    ].
 
 
-assert_equals(Name,Expected,Actual) ->
-    case Expected == Actual of
-        true ->
-            io:format("~s test passed~n", [Name]);
-        false ->
-            io:format("~s test failed: '~p' not equal to '~p'~n", [Name,Actual,Expected])
-    end.
-
-productR([]) ->
+product_r([]) ->
     1;
-productR([X|Xs]) ->
-    X*productR(Xs).
+product_r([X|Xs]) ->
+    X*product_r(Xs).
 
-productTR([], Acc) ->
+product_tr([], Acc) ->
     Acc;
-productTR([X|Xs], Acc) ->
-    productTR(Xs, X*Acc).
-productTR(X) ->
-    productTR(X, 1).
+product_tr([X|Xs], Acc) ->
+    product_tr(Xs, X*Acc).
+product_tr(X) ->
+    product_tr(X, 1).
 
-maxR([X]) ->
+max_r([X]) ->
     X;
-maxR([X,Y]) ->
+max_r([X,Y]) ->
     max(X,Y);
-maxR([X|Xs]) ->
-    max(X,maxR(Xs)).
+max_r([X|Xs]) ->
+    max(X,max_r(Xs)).
 
-maxTR([], Max) ->
+max_tr([], Max) ->
     Max;
-maxTR([X|Xs], Max) ->
-    maxTR(Xs, max(X,Max)).
+max_tr([X|Xs], Max) ->
+    max_tr(Xs, max(X,Max)).
 
-maxTR([X|Xs]) ->
-    maxTR(Xs, X).
+max_tr([X|Xs]) ->
+    max_tr(Xs, X).
 
-maxFold([X|Xs]) ->
+max_fold([X|Xs]) ->
     lists:foldl(fun(Max,Y) -> max(Max,Y) end, X, Xs).
 
+%% Define an Erlang function double/1 to double the elements of a list of numbers.
 double([],Acc) ->
     Acc;
 double([X|Xs],Acc) ->
@@ -62,6 +80,7 @@ double([X|Xs],Acc) ->
 double(Xs) ->
     double(Xs,[]).
 
+%% Define a function evens/1 that extracts the even numbers from a list of integers.
 even([],Acc) ->
     Acc;
 even([X|Xs],Acc) when X rem 2 == 0 ->
@@ -81,9 +100,7 @@ filter(F,[X|Xs]) ->
         false -> filter(F,Xs)
     end.
 
-
-median([]) ->
-    [];
+%% the median of a list of numbers: this is the middle element when the list is ordered (if the list is of even length you should average the middle two)
 median(Xs) ->
     Ys = isort(Xs),
     find_median(Ys,Ys,0,hd(Ys)).
@@ -108,9 +125,9 @@ find_median([_|Xs],[Y|Ys],Idx,_) when Idx rem 2 == 0 ->
 find_median([_|Xs],Ys,Idx,Median) ->
     find_median(Xs,Ys,Idx+1,Median).
 
-
+%% the modes of a list of numbers: this is a list consisting of the numbers that occur most frequently in the list; if there is is just one, this will be a list with one element only
 modes(Xs) ->
-    {Modes,_Occs}=modes(Xs,[]),
+    {Modes,_N}=modes(Xs,[]),
     Modes.
 modes([],Occs) ->
     extract_modes(Occs,{[],0});
