@@ -4,19 +4,21 @@
 
 suite() ->
     [
-     product_test_(),
+     product_test_(fun product_r/1),
+     product_test_(fun product_tr/1),
      max_test_(),
      median_test_(),
      median_test_(),
      modes_test_()
     ].
 
-product_test_() ->
-    [
-     ?assertEqual(24, product_r([1,2,3,4])),
-     ?assertEqual(24, product_tr([1,2,3,4])),
-     ?assertEqual(1, product_tr([]))
-    ].
+product_test_(F) ->
+    {"Product",
+     [
+      {"Non-empty list", ?assertEqual(24, F([1,2,3,4]))},
+      {"Empty list", ?assertEqual(1, F([]))}
+     ]
+    }.
 
 max_test_() ->
     [
