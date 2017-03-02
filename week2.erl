@@ -1,5 +1,5 @@
 -module(week2).
--export([]).
+-export([suite/0,product_r/1,product_tr/1,max_r/1,max_tr/1,median/1,modes/1,take/2,nub/1,bun/1,palindrome/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 suite() ->
@@ -8,8 +8,8 @@ suite() ->
      product_test_(fun product_tr/1),
      max_test_(),
      median_test_(),
-     median_test_(),
-     modes_test_()
+     modes_test_(),
+     palindrome_test_()
     ].
 
 product_test_(F) ->
@@ -41,6 +41,12 @@ modes_test_() ->
     [
      ?assertEqual([9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
      ?assertEqual([18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]))
+    ].
+
+palindrome_test_() ->
+    [
+     {"'Madam I\'m Adam' is a palindrome", ?assertEqual(true,palindrome("Madam I\'m Adam"))},
+      {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
     ].
 
 
@@ -151,3 +157,65 @@ extract_modes([{X,OccX}|Xs],{_,OccY}) when OccX > OccY ->
     extract_modes(Xs,{[X],OccX});
 extract_modes([{_,OccX}|Xs],{_,OccY}=Acc) when OccY > OccX ->
     extract_modes(Xs,Acc).
+
+-spec take(integer(),[T]) -> [T].
+take(N,Xs) ->
+    take(N,Xs,[]).
+take(_,[],Acc) ->
+    Acc;
+take(0,_,Acc) ->
+    Acc;
+take(N,[X|Xs],Acc) when N > 0 ->
+    take(N-1,Xs,Acc++[X]).
+
+-spec nub([T]) -> [T].
+nub(Xs) ->
+    lists:foldr(fun duplicate/2, [], Xs).
+duplicate(X,Xs) ->
+    case lists:member(X,Xs) of
+        true ->
+            Xs;
+        false ->
+            [X|Xs]
+    end.
+bun([]) ->
+    [];
+bun([X|Xs]) ->
+    case lists:member(X,Xs) of
+        true ->
+            bun(Xs);
+        false ->
+            [X|bun(Xs)]
+    end.
+
+bun1(Xs) ->
+    lists:foldl(fun duplicate1/2, [], Xs).
+duplicate1(X,Xs) ->
+    case lists:member(X,Xs) of
+        true ->
+            Xs;
+        false ->
+            Xs ++ [X]
+    end.
+
+-spec palindrome([integer()]) -> boolean().
+palindrome(Xs) ->
+    Ys = sanitise_string(Xs,[]),
+    palindrome(Ys,lists:reverse(Ys)).
+palindrome([],[]) ->
+    true;
+palindrome([X|Xs],[X|Sx]) ->
+    palindrome(Xs,Sx);
+palindrome(_,_) ->
+    false.
+
+sanitise_string([],Acc) ->
+    Acc;
+sanitise_string([X|Xs],Acc) when (X >= 65) and (X < 91) ->
+    XtoLowerCase = X + 32,
+    sanitise_string(Xs,Acc ++ [XtoLowerCase]);
+sanitise_string([X|Xs],Acc) when (X >= 97) and (X < 123) ->
+    sanitise_string(Xs,Acc ++ [X]);
+% skip character if is not a letter
+sanitise_string([_X|Xs],Acc) ->
+    sanitise_string(Xs,Acc).
