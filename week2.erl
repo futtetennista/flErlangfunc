@@ -23,26 +23,6 @@ max_test() ->
      ?assertEqual(1, max_fold([1]))
     ].
 
-median_test() ->
-    [
-     ?assertEqual(6, median([9,8,6,5,3])),
-     ?assertEqual(6, median([9,8,6,5,3,11])),
-     ?assertEqual(9, median([9]))
-    ].
-
-modes_test() ->
-    [
-     ?assertEqual([9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
-     ?assertEqual([18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]))
-    ].
-
-palindrome_test() ->
-    [
-     {"'Madam I\'m Adam' is a palindrome", ?assertEqual(true,palindrome("Madam I\'m Adam"))},
-      {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
-    ].
-
-
 product_r([]) ->
     1;
 product_r([X|Xs]) ->
@@ -102,6 +82,17 @@ filter(F,[X|Xs]) ->
     end.
 
 %% the median of a list of numbers: this is the middle element when the list is ordered (if the list is of even length you should average the middle two)
+median_test() ->
+    [
+     ?assertEqual(6, median([9,8,6,5,3])),
+     ?assertEqual(6, median([9,8,6,5,3,11])),
+     ?assertEqual(9, median([9]))
+    ].
+isort_test() ->
+    [
+     {"Insertionsort", ?assert(is_sorted(isort([9,7,6,3,3,2,1,4,8,5,11,10])))}
+    ].
+
 median(Xs) ->
     Ys = isort(Xs),
     find_median(Ys,Ys,0,hd(Ys)).
@@ -127,6 +118,12 @@ find_median([_|Xs],Ys,Idx,Median) ->
     find_median(Xs,Ys,Idx+1,Median).
 
 %% the modes of a list of numbers: this is a list consisting of the numbers that occur most frequently in the list; if there is is just one, this will be a list with one element only
+modes_test() ->
+    [
+     ?assertEqual([9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
+     ?assertEqual([18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]))
+    ].
+
 modes(Xs) ->
     {Modes,_N}=modes(Xs,[]),
     Modes.
@@ -193,6 +190,13 @@ duplicate1(X,Xs) ->
         false ->
             Xs ++ [X]
     end.
+
+% 2.15
+palindrome_test() ->
+    [
+     {"'Madam I\'m Adam' is a palindrome", ?assertEqual(true,palindrome("Madam I\'m Adam"))},
+      {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
+    ].
 
 -spec palindrome([integer()]) -> boolean().
 palindrome(Xs) ->
