@@ -1,5 +1,5 @@
 -module(week1).
--export([testXors/0, xOr1/2, xOr2/2, xOr3/2, xOr4/2, xOr5/2, xOr6/2, maxThree/3, howManyEqual/3, fib/1, maxPieces/1, fib1/1, fib/3, perfect/1, perfect1/1]).
+-export([testXors/0, xOr1/2, xOr2/2, xOr3/2, xOr4/2, xOr5/2, xOr6/2, maxThree/3, howManyEqual/3, fib/1, maxPieces/1, fib2/1, fib1/1, fib/3, perfect/1, perfect1/1,perfect2/1]).
 
 
 testXor(F) ->
@@ -88,7 +88,7 @@ fib2(N) ->
 divisors(X) ->
     lists:filter(fun(Y) -> X rem Y == 0 end, lists:seq(1, X div 2)).
 
-perfect1(X) ->
+perfect2(X) ->
     lists:sum(divisors(X)) == X.
 
 perfect(X) ->
@@ -108,7 +108,7 @@ perfect1(X) ->
     perfect1(X, 0, X div 2).
 perfect1(X, X, 0) ->
     true;
-perfect1(X,_,0) ->
+perfect1(_,_,0) ->
     false;
 perfect1(X, Acc, Div) when X rem Div == 0 ->
     perfect(X,Acc+Div,Div-1);
