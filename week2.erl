@@ -1,18 +1,12 @@
 -module(week2).
--export([suite/0,product_r/1,product_tr/1,max_r/1,max_tr/1,median/1,modes/1,take/2,nub/1,bun/1,palindrome/1]).
+-export([product_r/1,product_tr/1,max_r/1,max_tr/1,median/1,modes/1,take/2,nub/1,bun/1,palindrome/1]).
 -include_lib("eunit/include/eunit.hrl").
 
-suite() ->
-    [
-     product_test_(fun product_r/1),
-     product_test_(fun product_tr/1),
-     max_test_(),
-     median_test_(),
-     modes_test_(),
-     palindrome_test_()
-    ].
 
-product_test_(F) ->
+product_test() ->
+    producttest(fun product_r/1),
+    producttest(fun product_tr/1).
+producttest(F) ->
     {"Product",
      [
       {"Non-empty list", ?assertEqual(24, F([1,2,3,4]))},
@@ -20,7 +14,7 @@ product_test_(F) ->
      ]
     }.
 
-max_test_() ->
+max_test() ->
     [
      ?assertEqual(3, max_r([1,2,3,-4])),
      ?assertEqual(3, max_tr([1,2,3,-4])),
@@ -30,20 +24,20 @@ max_test_() ->
      ?assertEqual(1, max_fold([1]))
     ].
 
-median_test_() ->
+median_test() ->
     [
      ?assertEqual(6, median([9,8,6,5,3])),
      ?assertEqual(6, median([9,8,6,5,3,11])),
      ?assertEqual(9, median([9]))
     ].
 
-modes_test_() ->
+modes_test() ->
     [
      ?assertEqual([9], modes([8,  11,  9,  14,  9,  15,  18,  6,  9,  10])),
      ?assertEqual([18,24], modes([15,  18,  18,  18,  20,  22,  24,  24,  24,  26,  26]))
     ].
 
-palindrome_test_() ->
+palindrome_test() ->
     [
      {"'Madam I\'m Adam' is a palindrome", ?assertEqual(true,palindrome("Madam I\'m Adam"))},
       {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
