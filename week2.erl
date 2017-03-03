@@ -2,7 +2,6 @@
 -export([product_r/1,product_tr/1,max_r/1,max_tr/1,median/1,modes/1,take/2,nub/1,bun/1,palindrome/1]).
 -include_lib("eunit/include/eunit.hrl").
 
-
 product_test() ->
     producttest(fun product_r/1),
     producttest(fun product_tr/1).
