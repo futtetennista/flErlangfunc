@@ -158,6 +158,13 @@ take(0,_,Acc) ->
 take(N,[X|Xs],Acc) when N > 0 ->
     take(N-1,Xs,Acc++[X]).
 
+drop(_,[]) ->
+    [];
+drop(0,Xs) ->
+    Xs;
+drop(N,[_|Xs]) ->
+    drop(N-1,Xs).
+
 -spec nub([T]) -> [T].
 nub(Xs) ->
     lists:foldr(fun duplicate/2, [], Xs).
@@ -226,3 +233,71 @@ is_letter(X) when (X >= $A andalso X =< $Z) orelse (X >= $a andalso X =< $z) ->
     true;
 is_letter(_X) ->
     false.
+
+% 2.18
+join([],[]) ->
+    [];
+join([X|Xs],Ys) ->
+    [X|join(Xs,Ys)];
+join([],[Y|Ys]) ->
+    [Y|join([],Ys)].
+
+concat([]) ->
+    [];
+concat([X|Xs]) ->
+    join(X,concat(Xs)).
+
+member(_X,[]) ->
+    false;
+member(X,[X|_Xs]) ->
+    true;
+member(X,[_X|Xs]) ->
+    member(X,Xs).
+
+-spec is_sorted([_]) -> boolean().
+is_sorted([]) ->
+    true;
+is_sorted([_]) ->
+    true;
+is_sorted([X,Y|Xs]) when X =< Y ->
+    is_sorted([Y|Xs]);
+is_sorted(_) ->
+    false.
+
+msort_test() ->
+    [
+     {"Mergesorty", ?assert(is_sorted(msort([9,7,6,3,3,2,1,4,8,5,11,10])))}
+    ].
+
+msort([X]) ->
+    [X];
+msort(Xs) ->
+    Mid = length(Xs) div 2,
+    LeftXs = msort(take(Mid,Xs)),
+    RightXs = msort(drop(Mid,Xs)),
+    merge(LeftXs,RightXs,[]).
+merge([],Ys,Acc) ->
+    join(Acc,Ys);
+merge(Xs,[],Acc) ->
+    join(Acc,Xs);
+merge([X|Xs],[Y|_]=Rs,Acc) when X < Y ->
+    merge(Xs,Rs,join(Acc,[X]));
+merge(Xs,[Y|Ys],Acc) ->
+    merge(Xs,Ys,join(Acc,[Y])).
+
+qsort_test() ->
+    [
+     {"Quicksorty", ?assert(is_sorted(qsort([9,7,6,3,3,2,1,4,8,5,11,10])))}
+    ].
+
+qsort([]) ->
+    [];
+qsort([X|Xs]) ->
+    {Init,Tail} = partition(X,Xs,[],[]),
+    qsort(Init) ++ [X] ++ qsort(Tail).
+partition(_,[],Init,Tail) ->
+    {Init,Tail};
+partition(X,[Y|Ys],Init,Tail) when X > Y ->
+    partition(X,Ys,join(Init,[Y]),Tail);
+partition(X,[Y|Ys],Init,Tail) ->
+    partition(X,Ys,Init,join(Tail,[Y])).
