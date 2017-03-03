@@ -178,6 +178,8 @@ duplicate(X,Xs) ->
         false ->
             [X|Xs]
     end.
+
+-spec bun([T]) -> [T].
 bun([]) ->
     [];
 bun([X|Xs]) ->
@@ -188,6 +190,7 @@ bun([X|Xs]) ->
             [X|bun(Xs)]
     end.
 
+-spec bun1([T]) -> [T].
 bun1(Xs) ->
     lists:foldl(fun duplicate1/2, [], Xs).
 duplicate1(X,Xs) ->
@@ -200,22 +203,29 @@ duplicate1(X,Xs) ->
 
 -spec palindrome([integer()]) -> boolean().
 palindrome(Xs) ->
-    Ys = sanitise_string(Xs,[]),
-    palindrome(Ys,lists:reverse(Ys)).
-palindrome([],[]) ->
-    true;
-palindrome([X|Xs],[X|Sx]) ->
-    palindrome(Xs,Sx);
-palindrome(_,_) ->
-    false.
+    Ys = to_lower(nopunct(Xs,[]),[]),
+    Ys == lists:reverse(Ys,[]).
 
-sanitise_string([],Acc) ->
+to_lower([],Acc) ->
     Acc;
-sanitise_string([X|Xs],Acc) when (X >= 65) and (X < 91) ->
+to_lower([X|Xs],Acc) when X >= $A andalso X < $Z ->
     XtoLowerCase = X + 32,
-    sanitise_string(Xs,Acc ++ [XtoLowerCase]);
-sanitise_string([X|Xs],Acc) when (X >= 97) and (X < 123) ->
-    sanitise_string(Xs,Acc ++ [X]);
+    to_lower(Xs,Acc ++ [XtoLowerCase]);
+to_lower([X|Xs],Acc) ->
+    to_lower(Xs,Acc ++ [X]).
+
 % skip character if is not a letter
-sanitise_string([_X|Xs],Acc) ->
-    sanitise_string(Xs,Acc).
+nopunct([],Acc) ->
+    Acc;
+nopunct([X|Xs],Acc) ->
+    case is_letter(X) of
+        true ->
+            nopunct(Xs,Acc++[X]);
+        false ->
+            nopunct(Xs,Acc)
+    end.
+
+is_letter(X) when (X >= $A andalso X =< $Z) orelse (X >= $a andalso X =< $z) ->
+    true;
+is_letter(_X) ->
+    false.
