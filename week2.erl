@@ -301,3 +301,23 @@ partition(X,[Y|Ys],Init,Tail) when X > Y ->
     partition(X,Ys,join(Init,[Y]),Tail);
 partition(X,[Y|Ys],Init,Tail) ->
     partition(X,Ys,Init,join(Tail,[Y])).
+
+permutations_test() ->
+    [
+      {
+        "Permutations of [1,2,3]",
+        ?assertEqual([[1,2,3],[2,1,3],[2,3,1],[1,3,2],[3,1,2],[3,2,1]], permutations([1,2,3]))
+      }
+    ].
+
+-spec permutations([_]) -> [[_]].
+permutations([]) ->
+    [[]];
+permutations([X|Xs]) ->
+    concat(lists:map(fun(Ys) -> interleave(X, Ys) end,permutations(Xs))).
+
+-spec interleave(_,[_]) -> [[_]].
+interleave(X,[]) ->
+    [[X]];
+interleave(X,[Y|Ys]) ->
+    join([[X,Y|Ys]],lists:map(fun(Zs) -> [Y|Zs] end, interleave(X,Ys))).
