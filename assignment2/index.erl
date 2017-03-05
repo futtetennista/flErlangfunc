@@ -1,9 +1,9 @@
 -module(index).
--export([index/1]).
+-export([index_file/1]).
 
 
--spec index(nonempty_string()) -> [{nonempty_string(),[{integer(),integer()}]}].
-index(Name) ->
+-spec index_file(nonempty_string()) -> [{nonempty_string(),[{integer(),integer()}]}].
+index_file(Name) ->
     {Res,_} = build_index(get_file_contents(Name)),
     lists:sort(Res).
 
