@@ -1,14 +1,14 @@
 -module(index).
--export([get_file_contents/1,show_file_contents/1,word_map/1]).
+-export([index/1]).
 
 
--spec word_map(nonempty_string()) -> [{nonempty_string(),[{integer(),integer()}]}].
-word_map(Name) ->
-    {Res,_} = build_word_map(get_file_contents(Name)),
+-spec index(nonempty_string()) -> [{nonempty_string(),[{integer(),integer()}]}].
+index(Name) ->
+    {Res,_} = build_index(get_file_contents(Name)),
     lists:sort(Res).
 
--spec build_word_map([nonempty_string()]) -> {[{nonempty_string(),[{integer(),integer()}]}],integer()}.
-build_word_map(Lines) ->
+-spec build_index([nonempty_string()]) -> {[{nonempty_string(),[{integer(),integer()}]}],integer()}.
+build_index(Lines) ->
     lists:foldl(fun(L,{Xs,LineNum}) -> {word_occurrences(nub(longer_than(3,nopunct(words(to_lower(L))))),LineNum,Xs),LineNum+1} end,{[],1},Lines).
 
 nopunct(Xss) ->
