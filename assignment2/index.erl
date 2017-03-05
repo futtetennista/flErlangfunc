@@ -60,7 +60,7 @@ word_occurrences([W|Ws],LineNum,Acc) ->
 save_occurrence(W,LineNum,[]) ->
     [{W,[{LineNum,LineNum}]}];
 save_occurrence(W,LineNum,[{W,Occs}|Xs]) ->
-    [{W,normalise_occurrences(Occs++[{LineNum,LineNum}])}|save_occurrence(W,LineNum,Xs)];
+    [{W,normalise_occurrences(Occs++[{LineNum,LineNum}])}|Xs];
 save_occurrence(W,LineNum,[X|Xs]) ->
     [X|save_occurrence(W,LineNum,Xs)].
 
