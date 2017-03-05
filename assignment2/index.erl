@@ -4,14 +4,17 @@
 
 -spec index_file(nonempty_string()) -> [{nonempty_string(),[{integer(),integer()}]}].
 index_file(Name) ->
-    {Res,_} = build_index(get_file_contents(Name)),
-    lists:sort(Res).
+    {Index,_} = build_index(get_file_contents(Name)),
+    lists:sort(maps:to_list(Index)).
 
--spec build_index([nonempty_string()]) -> {[{nonempty_string(),[{integer(),integer()}]}],integer()}.
+% Not filtering out 'common words' atm
 build_index(Lines) ->
-    lists:foldl(fun(L,{Xs,LineNum}) -> {word_occurrences(nub(longer_than(3,nopunct(words(to_lower(L))))),LineNum,Xs),LineNum+1} end,{[],1},Lines).
+    lists:foldl(fun(L,{Map,LineNum}) -> {process_line(L,LineNum,Map),LineNum+1} end,{#{},1},Lines).
 
-nopunct(Xss) ->
+process_line(Line,LineNum,Map) ->
+    word_occurrences(longer_than(3,letters_only(tokens(to_lower(Line)))),LineNum,Map).
+
+letters_only(Xss) ->
     lists:foldr(fun(Xs,Acc) -> [lists:filter(fun letter/1, Xs)|Acc] end,[[]],Xss).
 
 letter(X) ->
@@ -31,38 +34,32 @@ to_lower([X|Xs],Acc) when X >= $A andalso X < $Z ->
 to_lower([X|Xs],Acc) ->
     to_lower(Xs,Acc ++ [X]).
 
--spec nub([T]) -> [T].
-nub(Xs) ->
-    lists:foldr(fun duplicate/2, [], Xs).
-duplicate(X,Xs) ->
-    case lists:member(X,Xs) of
-        true ->
-            Xs;
-        false ->
-            [X|Xs]
-    end.
-
--spec words(nonempty_string()) -> [nonempty_string()].
-words(Line) ->
+-spec tokens(nonempty_string()) -> [nonempty_string()].
+tokens(Line) ->
     lists:filter(fun(Xs) -> Xs =/= [] end,lists:foldr(fun break_on_space/2,[[]],Line)).
 break_on_space(X,Xss) when X == 32 -> % ASCII code for space
     [[]]++Xss;
 break_on_space(X,Xss) ->
     [[X]++hd(Xss)]++tl(Xss).
 
--spec word_occurrences(string(),integer(),[{nonempty_string(),[{integer(),integer()}]}]) -> [{nonempty_string(),[{integer(),integer()}]}].
-word_occurrences([],_,Acc) ->
-    Acc;
-word_occurrences([W|Ws],LineNum,Acc) ->
-    word_occurrences(Ws,LineNum,save_occurrence(W,LineNum,Acc)).
+word_occurrences([],_,Map) ->
+    Map;
+word_occurrences([W|Ws],LineNum,Map) ->
+    word_occurrences(Ws,LineNum,put_occurrence(W,LineNum,Map)).
 
--spec save_occurrence(string(),integer(),[{nonempty_string(),[{integer(),integer()}]}]) -> [{nonempty_string(),[{integer(),integer()}]}].
-save_occurrence(W,LineNum,[]) ->
-    [{W,[{LineNum,LineNum}]}];
-save_occurrence(W,LineNum,[{W,Occs}|Xs]) ->
-    [{W,normalise_occurrences(Occs++[{LineNum,LineNum}])}|Xs];
-save_occurrence(W,LineNum,[X|Xs]) ->
-    [X|save_occurrence(W,LineNum,Xs)].
+put_occurrence(W,LineNum,Map) ->
+    case maps:find(W,Map) of
+        error ->
+            maps:put(W,[{LineNum,LineNum}],Map);
+        {_,Xs} ->
+            Occs = case lists:member({LineNum,LineNum},Xs) of
+                       false ->
+                           normalise_occurrences(Xs++[{LineNum,LineNum}]);
+                       true ->
+                           Xs
+                   end,
+            maps:put(W,Occs,Map)
+    end.
 
 -spec normalise_occurrences([{integer(),integer()}]) -> [{integer(),integer()}].
 normalise_occurrences(Occs) ->
