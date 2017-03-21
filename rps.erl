@@ -7,19 +7,20 @@
 %
 
 play_two(StrategyL,StrategyR,N) ->
-    play_two(StrategyL,StrategyR,[],[],N).
+    play_two(StrategyL,StrategyR,[],[],N,0).
 
 % tail recursive loop for play_two/5
 % 0 case computes the result of the tournament
-play_two(_,_,PlaysL,PlaysR,0) ->
-    FinalResult=tournament(PlaysL,PlaysR),
-    io:format("Final Result: ~p~n",[FinalResult]);
-play_two(StrategyL,StrategyR,PlaysL,PlaysR,N) ->
+play_two(_,_,_PlaysL,_PlaysR,0,Result) ->
+    io:format("Final Result: ~p~n",[Result]);
+play_two(StrategyL,StrategyR,PlaysL,PlaysR,N,Result) when abs(Result) >= N div 2 + 1 ->
+    play_two(StrategyL,StrategyR,PlaysL,PlaysR,0,Result);
+play_two(StrategyL,StrategyR,PlaysL,PlaysR,N,Result) ->
     PlayL=StrategyL(PlaysR),
     PlayR=StrategyR(PlaysL),
     PlayResult=result(PlayL,PlayR),
     io:format("Play Result: ~p~n",[outcome(PlayResult)]),
-    play_two(StrategyL,StrategyR,[PlayL|PlaysL],[PlayR|PlaysR],N-1).
+    play_two(StrategyL,StrategyR,[PlayL|PlaysL],[PlayR|PlaysR],N-1,Result+PlayResult).
 
 %
 % interactively play against a strategy, provided as argument.
