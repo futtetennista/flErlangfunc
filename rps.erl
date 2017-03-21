@@ -173,7 +173,7 @@ mode([],Dict) ->
                                    false ->
                                        Acc
                                end
-                       end,{rock,0},Dict),
+                       end,{rand([]),0},Dict),
     Play;
 mode([X|Xs],Dict) ->
     F=fun(Occs) -> Occs+1 end,
