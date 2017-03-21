@@ -205,19 +205,21 @@ best_among(Strategies) ->
 
 pick_best_strategy(Strategies,PlaysL) ->
     Init={rand_among(Strategies),0},
-    {BestStrategy,_}=lists:foldr(fun(Strategy,{_BestStrategy,MaxWins}=Acc) ->
+    {BestStrategy,_}=lists:foldr(fun(Strategy,Acc) ->
                                          PlaysR=replay_strategy(Strategy,PlaysL),
-                                         %% -N means right wins
                                          Wins=tournament(PlaysL,PlaysR),
-                                         %% wins is a negative for right, so pick the smaller value
-                                         case Wins > MaxWins of
-                                             true ->
-                                                 Acc;
-                                             false ->
-                                                 {Strategy,Wins}
-                                         end
+                                         compare_strategies({Strategy,Wins},Acc)
                                  end,Init,Strategies),
     BestStrategy.
+
+compare_strategies({_StrategyA,WinsA}=A,{_StrategyB,WinsB}=B) ->
+    %% wins is a negative for right, so pick the smaller value
+    case WinsA > WinsB of
+        true ->
+            B;
+        false ->
+            A
+    end.
 
 %% Build plays from opponent's ones.
 replay_strategy(Strategy,Plays) ->
