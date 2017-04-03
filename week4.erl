@@ -20,16 +20,16 @@ handle_request(Cid,Str) ->
             Cid ! {result,"'" ++ Str ++ "' is not a palindrome",self()}
     end.
 
-client(ServerPid,CallerPid) ->
+client(Server,Caller) ->
     receive
         {check,Str} ->
-            ServerPid ! {self(),check,Str},
-            client(ServerPid,CallerPid);
-        {result,Str} ->
-            CallerPid ! {result,Str},
-            client(ServerPid,CallerPid);
+            Server ! {self(),check,Str},
+            client(Server,Caller);
+        {result,Str,From} ->
+            Caller ! {result,Str,From},
+            client(Server,From);
         stop ->
-            CallerPid ! "Here to serve you"
+            Caller ! "Here to serve you"
     end.
 
 reverse_proxy(Owner,Servers) ->
