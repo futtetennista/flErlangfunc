@@ -202,17 +202,17 @@ duplicate1(X,Xs) ->
 palindrome_test() ->
     [
      {"'Madam I\'m Adam' is a palindrome", ?assertEqual(true,palindrome("Madam I\'m Adam"))},
-      {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
+     {"'Hello World' is a not palindrome", ?assertEqual(false,palindrome("Madam I\'m Adamo"))}
     ].
 
--spec palindrome([integer()]) -> boolean().
+-spec palindrome(string()) -> boolean().
 palindrome(Xs) ->
     Ys = to_lower(nopunct(Xs,[]),[]),
     Ys == lists:reverse(Ys,[]).
 
 to_lower([],Acc) ->
     Acc;
-to_lower([X|Xs],Acc) when X >= $A andalso X < $Z ->
+to_lower([X|Xs],Acc) when X >= $A andalso X =< $Z ->
     XtoLowerCase = X + 32,
     to_lower(Xs,Acc ++ [XtoLowerCase]);
 to_lower([X|Xs],Acc) ->
