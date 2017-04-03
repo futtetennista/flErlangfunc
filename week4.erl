@@ -3,13 +3,13 @@
 -import(week2,[palindrome/1]).
 
 
-server(OwnerPid) ->
+server(Owner) ->
     receive
-        {Cid,check,Str} ->
-            handle_request(Cid,Str),
-            server(OwnerPid);
-        {Cid,_msg} when Cid == OwnerPid ->
-            OwnerPid ! "Shutting down"
+        {From,check,Str} ->
+            handle_request(From,Str),
+            server(Owner);
+        {From,_msg} when From == Owner ->
+            Owner ! "Shutting down"
     end.
 
 handle_request(Cid,Str) ->
@@ -32,16 +32,16 @@ client(ServerPid,CallerPid) ->
             CallerPid ! "Here to serve you"
     end.
 
-reverse_proxy(OwnerPid,ServerPids) ->
+reverse_proxy(Owner,Servers) ->
     receive
         Msg={_Cid,check,_Str} ->
-            pick_server(ServerPids) ! Msg,
-            reverse_proxy(OwnerPid,ServerPids);
-        {Cid,_msg} when Cid == OwnerPid ->
-            OwnerPid ! "Shutting down"
+            pick_server(Servers) ! Msg,
+            reverse_proxy(Owner,Servers);
+        {Cid,_msg} when Cid == Owner ->
+            Owner ! "Shutting down"
     end.
 
--spec [integer()] -> integer()
-pick_server(Pids) ->
-    Index=random:uniform(length(Pids)),
-    lists:nth(Index,Pids).
+-spec pick_server([integer()]) -> integer().
+pick_server(Servers) ->
+    Index=random:uniform(length(Servers)),
+    lists:nth(Index,Servers).
